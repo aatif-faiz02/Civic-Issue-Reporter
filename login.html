@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CivicIssue | Login & Earn Rewards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-bg: #eef2ff;
+            --secondary: #ec4899;
+            --secondary-light: #f472b6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.25);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes moveBackground {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* Floating shapes */
+        .floating-shape {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            right: 5%;
+            animation-delay: 1s;
+        }
+
+        .shape-3 {
+            width: 80px;
+            height: 80px;
+            top: 50%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .shape-4 {
+            width: 120px;
+            height: 120px;
+            bottom: 20%;
+            left: 10%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        /* Login Container */
+        .login-wrapper {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Login Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-2xl);
+            padding: 48px 40px;
+            box-shadow: var(--shadow-2xl);
+            transition: transform 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-animation {
+            display: inline-block;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .logo-icon-large {
+            font-size: 70px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .login-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Toggle Buttons */
+        .auth-toggle {
+            display: flex;
+            gap: 12px;
+            background: var(--gray-100);
+            padding: 6px;
+            border-radius: var(--radius-full);
+            margin-bottom: 32px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Forms */
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--gray-400);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--gray-400);
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: var(--gray-600);
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .login-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Demo Credentials */
+        .demo-credentials {
+            background: linear-gradient(135deg, var(--primary-bg), #e0e7ff);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .demo-credentials p {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .demo-badge:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Signup Link */
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .auth-footer a:hover {
+            color: var(--secondary);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gray-800);
+            color: white;
+            padding: 14px 28px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success {
+            background: var(--success);
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .login-header h1 {
+                font-size: 28px;
+            }
+
+            .logo-icon-large {
+                font-size: 55px;
+            }
+
+            .form-input {
+                padding: 12px 16px 12px 44px;
+                font-size: 16px; /* Prevents zoom on mobile */
+            }
+
+            .input-icon {
+                left: 14px;
+                font-size: 16px;
+            }
+
+            .login-btn {
+                padding: 12px;
+            }
+
+            .demo-credentials p {
+                font-size: 11px;
+            }
+
+            .demo-badge {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+
+            .toast {
+                font-size: 12px;
+                padding: 10px 20px;
+                white-space: nowrap;
+            }
+
+            .auth-toggle {
+                margin-bottom: 24px;
+            }
+
+            .toggle-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 24px 20px;
+            }
+
+            .login-header {
+                margin-bottom: 28px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .demo-credentials {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .login-card {
+                padding: 20px 16px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+
+            .logo-icon-large {
+                font-size: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating animated shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-animation">
+                    <div class="logo-icon-large">🛡️</div>
+                </div>
+                <h1>CivicIssue</h1>
+                <p>Report. Track. Earn Rewards.</p>
+            </div>
+
+            <!-- Toggle Buttons -->
+            <div class="auth-toggle">
+                <button class="toggle-btn active" onclick="switchForm('login')">Login</button>
+                <button class="toggle-btn" onclick="switchForm('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📧</span>
+                            <input type="email" id="loginEmail" class="form-input" required placeholder="Enter your email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="loginPassword" class="form-input" required placeholder="Enter your password">
+                            <span class="password-toggle" onclick="togglePassword('loginPassword')">👁️</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">Login →</button>
+                </form>
+
+                <!-- Demo Credentials -->
+                <div class="demo-credentials">
+                    <p>🎯 Demo Account</p>
+                    <div class="demo-badge" onclick="fillDemoCredentials()">
+                        📧 alex@example.com | 🔑 123456
+                    </div>
+                </div>
+
+                <div class="auth-footer">
+                    Don't have an account? <a href="#" onclick="switchForm('signup'); return false;">Sign up</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form">
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="signupName" class="form-input" required placeholder="Enter your full name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📧</span>
+                            <input type="email" id="signupEmail" class="form-input" required placeholder="Enter your email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="signupPassword" class="form-input" required placeholder="Create password (min 6 chars)">
+                            <span class="password-toggle" onclick="togglePassword('signupPassword')">👁️</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">✓</span>
+                            <input type="password" id="signupConfirmPassword" class="form-input" required placeholder="Confirm your password">
+                            <span class="password-toggle" onclick="togglePassword('signupConfirmPassword')">👁️</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">Create Account →</button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="#" onclick="switchForm('login'); return false;">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Switch between login and signup forms
+        function switchForm(formType) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            
+            if (formType === 'login') {
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+                toggleBtns[0].classList.add('active');
+                toggleBtns[1].classList.remove('active');
+            } else {
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+                toggleBtns[1].classList.add('active');
+                toggleBtns[0].classList.remove('active');
+            }
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
+        // Fill demo credentials
+        function fillDemoCredentials() {
+            document.getElementById('loginEmail').value = 'alex@example.com';
+            document.getElementById('loginPassword').value = '123456';
+            showToast('Demo credentials filled! Click Login', 'success');
+        }
+
+        // Show toast message
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('toast-success', 'toast-error');
+            
+            if (type === 'success') {
+                toast.classList.add('toast-success');
+            } else if (type === 'error') {
+                toast.classList.add('toast-error');
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            // Get users from localStorage
+            let users = JSON.parse(localStorage.getItem('civic_users') || '[]');
+            
+            // Check if users exist, if not create default demo user
+            if (users.length === 0) {
+                users = [{
+                    id: 'user_001',
+                    name: 'Alex Chen',
+                    email: 'alex@example.com',
+                    password: '123456',
+                    rewards: 175,
+                    joinDate: new Date().toISOString().split('T')[0],
+                    reportsCount: 5,
+                    resolvedCount: 3,
+                    avatar: '👤',
+                    transactions: [
+                        { id: 'tx_001', amount: 100, date: new Date().toISOString().split('T')[0], description: 'Illegal dumping report' },
+                        { id: 'tx_002', amount: 50, date: new Date().toISOString().split('T')[0], description: 'Vandalism report' }
+                    ]
+                }];
+                localStorage.setItem('civic_users', JSON.stringify(users));
+            }
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Store current user
+                localStorage.setItem('civic_current_user', JSON.stringify(user));
+                showToast('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                showToast('Invalid email or password!', 'error');
+            }
+        }
+
+        // Handle Signup
+        function handleSignup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters!', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Get existing users
+            let users = JSON.parse(localStorage.getItem('civic_users') || '[]');
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                showToast('Email already registered! Please login.', 'error');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                rewards: 0,
+                joinDate: new Date().toISOString().split('T')[0],
+                reportsCount: 0,
+                resolvedCount: 0,
+                avatar: '👤',
+                transactions: []
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('civic_users', JSON.stringify(users));
+            localStorage.setItem('civic_current_user', JSON.stringify(newUser));
+            
+            showToast('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
+        // Initialize data if needed
+        function initializeData() {
+            if (!localStorage.getItem('civic_complaints')) {
+                const initialComplaints = [
+                    {
+                        id: 'CIV-001',
+                        type: 'authority',
+                        title: 'Deep pothole on Main Street',
+                        location: 'Main Street, near City Mall',
+                        description: 'Large pothole causing accidents and traffic jams',
+                        category: 'Pothole / Road Damage',
+                        priority: 'high',
+                        status: 'progress',
+                        upvotes: 247,
+                        date: new Date().toISOString().split('T')[0],
+                        userId: 'user_001',
+                        userName: 'Alex Chen',
+                        anonymous: false,
+                        timeline: [
+                            { status: 'submitted', date: new Date().toISOString().split('T')[0], note: 'Report submitted' },
+                            { status: 'assigned', date: new Date().toISOString().split('T')[0], note: 'Assigned to Public Works' }
+                        ]
+                    },
+                    {
+                        id: 'CIV-002',
+                        type: 'authority',
+                        title: 'Broken streetlight',
+                        location: 'Park Avenue, Sector 12',
+                        description: 'Streetlight not working for 2 weeks, dangerous at night',
+                        category: 'Broken Streetlight',
+                        priority: 'critical',
+                        status: 'pending',
+                        upvotes: 89,
+                        date: new Date().toISOString().split('T')[0],
+                        userId: 'user_002',
+                        userName: 'Sarah Johnson',
+                        anonymous: false,
+                        timeline: [{ status: 'submitted', date: new Date().toISOString().split('T')[0], note: 'Report submitted' }]
+                    },
+                    {
+                        id: 'CIV-003',
+                        type: 'individual',
+                        title: 'Graffiti on heritage wall',
+                        location: 'Railway Station Underpass',
+                        description: 'Offensive graffiti on heritage wall',
+                        category: 'Vandalism / Graffiti',
+                        priority: 'high',
+                        status: 'verified',
+                        upvotes: 456,
+                        date: new Date().toISOString().split('T')[0],
+                        userId: 'user_003',
+                        userName: 'Mike Rodriguez',
+                        anonymous: false,
+                        reward: 50,
+                        rewardStatus: 'pending',
+                        timeline: [
+                            { status: 'submitted', date: new Date().toISOString().split('T')[0], note: 'Report submitted' },
+                            { status: 'verified', date: new Date().toISOString().split('T')[0], note: 'Verified - Fine issued' }
+                        ]
+                    }
+                ];
+                localStorage.setItem('civic_complaints', JSON.stringify(initialComplaints));
+            }
+        }
+        
+        // Initialize on load
+        initializeData();
+        
+        // Add enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeForm = document.querySelector('.auth-form.active');
+                if (activeForm.id === 'loginForm') {
+                    handleLogin(e);
+                } else if (activeForm.id === 'signupForm') {
+                    handleSignup(e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Report civic issues and vandalism. Track complaints. Earn rewards.">
+    <meta name="theme-color" content="#15803d">
+    <title>Civic Issue Reporter | Report & Earn Rewards</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="spinner"></div>
+        <p>Loading Civic Reporter...</p>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" style="display: none;">
+        <!-- Header / Navigation -->
+        <header class="header">
+            <div class="header-container">
+                <div class="logo" onclick="navigateTo('home')">
+                    <div class="logo-icon">🛡️</div>
+                    <div class="logo-text">Civic<span>Reporter</span></div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="navigateTo('dashboard')" id="dashboardBtn">
+                        📋
+                        <span class="tooltip">Dashboard</span>
+                    </button>
+                    <div class="reward-wallet" id="walletBtn" onclick="showWalletModal()">
+                        <span class="wallet-icon">🏆</span>
+                        <span class="wallet-amount" id="walletAmount">$0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <div class="bottom-nav-item active" data-nav="home" onclick="navigateTo('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="bottom-nav-item" data-nav="report" onclick="showReportOptions()">
+                <span class="nav-icon">➕</span>
+                <span class="nav-label">Report</span>
+            </div>
+            <div class="bottom-nav-item" data-nav="track" onclick="navigateTo('track')">
+                <span class="nav-icon">📍</span>
+                <span class="nav-label">Track</span>
+            </div>
+            <div class="bottom-nav-item" data-nav="dashboard" onclick="navigateTo('dashboard')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Home View -->
+            <div id="homeView" class="view active">
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <div class="hero-badge">⚡ Trusted by 10,000+ citizens</div>
+                    <h1 class="hero-title">Report. <span class="highlight">Track.</span> Earn.</h1>
+                    <p class="hero-subtitle">Hold authorities accountable & stop vandalism — get rewarded when fines are collected</p>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary btn-large" onclick="openReportModal('authority')">
+                            <span>🏛️</span> Report Authority
+                        </button>
+                        <button class="btn btn-secondary btn-large" onclick="openReportModal('individual')">
+                            <span>👤</span> Report Individual
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Summary -->
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalReports">0</div>
+                        <div class="stat-label">Total Reports</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="resolvedReports">0</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="activeReporters">0</div>
+                        <div class="stat-label">Active Reporters</div>
+                    </div>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all" onclick="filterComplaints('all', this)">All Issues</button>
+                    <button class="filter-tab" data-filter="authority" onclick="filterComplaints('authority', this)">🏛️ Authority</button>
+                    <button class="filter-tab" data-filter="individual" onclick="filterComplaints('individual', this)">👤 Individual</button>
+                    <button class="filter-tab" data-filter="nearby" onclick="getNearbyReports()">📍 Nearby</button>
+                </div>
+
+                <!-- Complaints List -->
+                <div id="complaintsContainer">
+                    <div class="skeleton-loader">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track View (Map & Nearby) -->
+            <div id="trackView" class="view">
+                <div class="view-header">
+                    <h2>Track Issues Near You</h2>
+                    <p>Real-time updates on civic problems in your area</p>
+                </div>
+                
+                <!-- Map Container (Mock Map) -->
+                <div class="map-container" id="mapContainer">
+                    <div class="map-mock">
+                        <div class="map-controls">
+                            <button class="map-zoom-in" onclick="zoomMap('in')">+</button>
+                            <button class="map-zoom-out" onclick="zoomMap('out')">-</button>
+                        </div>
+                        <div class="map-markers" id="mapMarkers"></div>
+                        <div class="map-attribution">📍 Interactive Map — Click markers for details</div>
+                    </div>
+                </div>
+
+                <!-- Nearby Issues List -->
+                <div class="nearby-header">
+                    <h3>📍 Issues Near You</h3>
+                    <button class="refresh-btn" onclick="getNearbyReports()">⟳ Refresh</button>
+                </div>
+                <div id="nearbyList"></div>
+            </div>
+
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="view">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="userAvatar">👤</div>
+                    <div class="profile-info">
+                        <h3 id="userName">Citizen Reporter</h3>
+                        <p class="user-role">Verified Reporter ⭐</p>
+                    </div>
+                    <button class="edit-profile" onclick="editProfile()">✎</button>
+                </div>
+
+                <!-- Dashboard Stats -->
+                <div class="dashboard-stats">
+                    <div class="dashboard-stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="dashboardTotal">0</div>
+                            <div class="stat-label">Total Reports</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="dashboardResolved">0</div>
+                            <div class="stat-label">Resolved</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="dashboardEarnings">$0</div>
+                            <div class="stat-label">Total Earned</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievement Badges -->
+                <div class="achievements-section">
+                    <h4>🏅 Achievements</h4>
+                    <div class="badges-container" id="badgesContainer"></div>
+                </div>
+
+                <!-- My Reports -->
+                <div class="my-reports-section">
+                    <h4>📝 My Reports</h4>
+                    <div id="myReportsList"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Report Options Modal (FAB menu) -->
+        <div id="reportOptionsModal" class="modal">
+            <div class="modal-backdrop" onclick="closeReportOptions()"></div>
+            <div class="modal-bottom-sheet">
+                <div class="sheet-header">
+                    <h3>Choose Report Type</h3>
+                    <button class="close-sheet" onclick="closeReportOptions()">✕</button>
+                </div>
+                <div class="sheet-options">
+                    <div class="report-option" onclick="openReportModal('authority'); closeReportOptions();">
+                        <div class="option-icon">🏛️</div>
+                        <div class="option-info">
+                            <div class="option-title">Report Against Authority</div>
+                            <div class="option-desc">Broken infrastructure, poor maintenance, civic neglect</div>
+                        </div>
+                    </div>
+                    <div class="report-option" onclick="openReportModal('individual'); closeReportOptions();">
+                        <div class="option-icon">👤</div>
+                        <div class="option-info">
+                            <div class="option-title">Report Against Individual</div>
+                            <div class="option-desc">Vandalism, littering, graffiti — earn rewards!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Form Modal -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2 id="reportModalTitle">Report Issue</h2>
+                    <button class="modal-close" onclick="closeReportModal()">✕</button>
+                </div>
+                
+                <div id="rewardNotification" class="reward-notification" style="display: none;">
+                    <span class="reward-icon">💰</span>
+                    <div class="reward-text">
+                        <strong>Reward Alert!</strong> If verified and fine collected, you earn 20% of the fine amount
+                    </div>
+                </div>
+
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label>Issue Title *</label>
+                        <input type="text" id="reportTitle" class="form-input" required 
+                               placeholder="e.g., Deep pothole causing accidents">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <div class="location-input-group">
+                            <input type="text" id="reportLocation" class="form-input" required 
+                                   placeholder="Search or select location">
+                            <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                                📍
+                            </button>
+                        </div>
+                        <div id="locationStatus" class="location-status"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="reportCategory" class="form-input">
+                                <option value="">Select category</option>
+                                <option value="pothole">🕳️ Pothole / Road Damage</option>
+                                <option value="streetlight">💡 Broken Streetlight</option>
+                                <option value="drainage">🌊 Drainage / Sewage</option>
+                                <option value="garbage">🗑️ Garbage / Waste</option>
+                                <option value="vandalism">🎨 Vandalism / Graffiti</option>
+                                <option value="other">📌 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Urgency Level</label>
+                            <select id="reportUrgency" class="form-input">
+                                <option value="low">🟢 Low</option>
+                                <option value="medium" selected>🟡 Medium</option>
+                                <option value="high">🔴 High</option>
+                                <option value="critical">⚫ Critical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea id="reportDesc" class="form-textarea" rows="4" required
+                                  placeholder="Describe what happened, when, and any other details..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidence (Photo/Video) *</label>
+                        <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📸</div>
+                            <div class="upload-text">Click or drag to upload evidence</div>
+                            <div class="upload-hint">Supports JPG, PNG, MP4 (Max 10MB)</div>
+                        </div>
+                        <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" capture="environment">
+                        <div id="filePreview" class="file-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="anonymousReport">
+                            <span>Report anonymously (no name shown publicly)</span>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Wallet Modal -->
+        <div id="walletModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>💰 My Wallet</h2>
+                    <button class="modal-close" onclick="closeWalletModal()">✕</button>
+                </div>
+                <div class="wallet-balance">
+                    <div class="balance-amount" id="modalWalletAmount">$0</div>
+                    <div class="balance-label">Total Rewards Earned</div>
+                </div>
+                <div class="wallet-transactions">
+                    <h4>Recent Transactions</h4>
+                    <div id="transactionsList"></div>
+                </div>
+                <div class="wallet-actions">
+                    <button class="btn btn-outline" onclick="withdrawRewards()">💸 Withdraw</button>
+                    <button class="btn btn-outline" onclick="donateRewards()">❤️ Donate to Cause</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaint Detail Modal -->
+        <div id="detailModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2 id="detailTitle">Complaint Details</h2>
+                    <button class="modal-close" onclick="closeDetailModal()">✕</button>
+                </div>
+                <div id="complaintDetailContent"></div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard | CivicIssue Reporter</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo" onclick="navigateTo('home')">
+                <div class="logo-icon">🛡️</div>
+                <div class="logo-text">Civic<span>Issue</span></div>
+            </div>
+            <div class="nav-links">
+                <button class="nav-link active" data-view="home" onclick="navigateTo('home')">🏠 Home</button>
+                <button class="nav-link" data-view="reports" onclick="navigateTo('reports')">📋 My Reports</button>
+                <button class="nav-link" data-view="track" onclick="navigateTo('track')">📍 Track</button>
+            </div>
+            <div class="header-right">
+                <div class="wallet" onclick="showWallet()">
+                    <span>💰</span>
+                    <span id="walletAmount">$0</span>
+                </div>
+                <div class="user-menu" onclick="toggleUserMenu()">
+                    <span id="userAvatar">👤</span>
+                    <span id="userName">User</span>
+                    <span>▼</span>
+                </div>
+                <div id="userDropdown" class="user-dropdown">
+                    <a onclick="logout()">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Home View -->
+        <div id="homeView" class="view active">
+            <!-- Hero Banner -->
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <div class="hero-badge">⭐ Trusted by 10,000+ citizens</div>
+                    <h1>Report Issues,<br><span class="gradient-text">Get Rewards</span></h1>
+                    <p>Hold authorities accountable & stop vandalism — earn up to 20% of fines collected</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="openReportModal('authority')">
+                            🏛️ Report Authority
+                        </button>
+                        <button class="btn btn-secondary" onclick="openReportModal('individual')">
+                            👤 Report Individual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="search-section">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search complaints by title or location..." onkeyup="searchComplaints()">
+                <div class="filter-chips">
+                    <button class="chip active" data-filter="all" onclick="filterComplaints('all', this)">All</button>
+                    <button class="chip" data-filter="authority" onclick="filterComplaints('authority', this)">🏛️ Authority</button>
+                    <button class="chip" data-filter="individual" onclick="filterComplaints('individual', this)">👤 Individual</button>
+                    <button class="chip" data-filter="high" onclick="filterComplaints('high', this)">🔴 High Priority</button>
+                    <button class="chip" data-filter="nearby" onclick="getNearbyReports()">📍 Nearby</button>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="totalReports">0</div>
+                        <div class="stat-label">Total Reports</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="resolvedReports">0</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="totalRewards">$0</div>
+                        <div class="stat-label">Total Rewards</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complaints Grid -->
+            <div id="complaintsContainer" class="complaints-grid"></div>
+        </div>
+
+        <!-- My Reports View -->
+        <div id="reportsView" class="view">
+            <h2 class="view-title">📋 My Reports</h2>
+            <div id="myReportsContainer" class="complaints-grid"></div>
+        </div>
+
+        <!-- Track View -->
+        <div id="trackView" class="view">
+            <h2 class="view-title">📍 Track Issues</h2>
+            <div class="map-container" id="mapContainer">
+                <div class="map-placeholder">
+                    <div class="map-markers" id="mapMarkers"></div>
+                    <div class="map-attribution">🗺️ Interactive Map — Click markers for details</div>
+                </div>
+            </div>
+            <div id="nearbyList" class="complaints-grid" style="margin-top: 20px;"></div>
+        </div>
+    </main>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-backdrop" onclick="closeReportModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Report Issue</h2>
+                <button class="modal-close" onclick="closeReportModal()">✕</button>
+            </div>
+            <div id="rewardAlert" class="reward-alert" style="display: none;">
+                💰 <strong>Reward Alert!</strong> If verified, you earn 20% of the fine collected!
+            </div>
+            <form id="reportForm" class="modal-form">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="reportTitle" class="form-control" required placeholder="e.g., Deep pothole on Main St">
+                </div>
+                <div class="form-group">
+                    <label>Location *</label>
+                    <div class="location-group">
+                        <input type="text" id="reportLocation" class="form-control" required placeholder="Street address">
+                        <button type="button" class="location-btn" onclick="getCurrentLocation()">📍</button>
+                    </div>
+                    <div id="locationStatus" class="location-status"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="reportCategory" class="form-control">
+                            <option>Pothole / Road Damage</option>
+                            <option>Broken Streetlight</option>
+                            <option>Drainage / Sewage</option>
+                            <option>Garbage / Waste</option>
+                            <option>Vandalism / Graffiti</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="reportPriority" class="form-control">
+                            <option value="low">🟢 Low</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="high">🔴 High</option>
+                            <option value="critical">⚫ Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="reportDesc" class="form-control" rows="4" required placeholder="Describe the issue in detail..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="anonymousReport"> Report anonymously
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-backdrop" onclick="closeDetailModal()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Complaint Details</h2>
+                <button class="modal-close" onclick="closeDetailModal()">✕</button>
+            </div>
+            <div id="detailContent" class="detail-content"></div>
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-backdrop" onclick="closeWalletModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💰 My Wallet</h2>
+                <button class="modal-close" onclick="closeWalletModal()">✕</button>
+            </div>
+            <div class="wallet-content">
+                <div class="wallet-balance">
+                    <div class="balance-amount" id="walletBalanceAmount">$0</div>
+                    <div class="balance-label">Total Earnings</div>
+                </div>
+                <div class="wallet-transactions">
+                    <h4>Transaction History</h4>
+                    <div id="transactionsList"></div>
+                </div>
+                <div class="wallet-actions">
+                    <button class="btn btn-outline" onclick="withdrawRewards()">💸 Withdraw</button>
+                    <button class="btn btn-outline" onclick="donateRewards()">❤️ Donate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
