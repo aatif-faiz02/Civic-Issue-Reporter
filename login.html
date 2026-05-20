@@ -370,41 +370,6 @@
             transform: translateY(0);
         }
 
-        /* Demo Credentials */
-        .demo-credentials {
-            background: linear-gradient(135deg, var(--primary-bg), #e0e7ff);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            margin-top: 24px;
-            text-align: center;
-        }
-
-        .demo-credentials p {
-            font-size: 13px;
-            color: var(--gray-600);
-            margin-bottom: 8px;
-        }
-
-        .demo-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: white;
-            padding: 6px 12px;
-            border-radius: var(--radius-full);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .demo-badge:hover {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.05);
-        }
-
         /* Signup Link */
         .auth-footer {
             text-align: center;
@@ -476,7 +441,7 @@
 
             .form-input {
                 padding: 12px 16px 12px 44px;
-                font-size: 16px; /* Prevents zoom on mobile */
+                font-size: 16px;
             }
 
             .input-icon {
@@ -486,15 +451,6 @@
 
             .login-btn {
                 padding: 12px;
-            }
-
-            .demo-credentials p {
-                font-size: 11px;
-            }
-
-            .demo-badge {
-                font-size: 11px;
-                padding: 4px 10px;
             }
 
             .toast {
@@ -524,10 +480,6 @@
 
             .form-group {
                 margin-bottom: 18px;
-            }
-
-            .demo-credentials {
-                padding: 12px;
             }
         }
 
@@ -592,14 +544,6 @@
 
                     <button type="submit" class="login-btn">Login →</button>
                 </form>
-
-                <!-- Demo Credentials -->
-                <div class="demo-credentials">
-                    <p>🎯 Demo Account</p>
-                    <div class="demo-badge" onclick="fillDemoCredentials()">
-                        📧 alex@example.com | 🔑 123456
-                    </div>
-                </div>
 
                 <div class="auth-footer">
                     Don't have an account? <a href="#" onclick="switchForm('signup'); return false;">Sign up</a>
@@ -689,13 +633,6 @@
             }
         }
 
-        // Fill demo credentials
-        function fillDemoCredentials() {
-            document.getElementById('loginEmail').value = 'alex@example.com';
-            document.getElementById('loginPassword').value = '123456';
-            showToast('Demo credentials filled! Click Login', 'success');
-        }
-
         // Show toast message
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
@@ -728,26 +665,6 @@
             
             // Get users from localStorage
             let users = JSON.parse(localStorage.getItem('civic_users') || '[]');
-            
-            // Check if users exist, if not create default demo user
-            if (users.length === 0) {
-                users = [{
-                    id: 'user_001',
-                    name: 'Alex Chen',
-                    email: 'alex@example.com',
-                    password: '123456',
-                    rewards: 175,
-                    joinDate: new Date().toISOString().split('T')[0],
-                    reportsCount: 5,
-                    resolvedCount: 3,
-                    avatar: '👤',
-                    transactions: [
-                        { id: 'tx_001', amount: 100, date: new Date().toISOString().split('T')[0], description: 'Illegal dumping report' },
-                        { id: 'tx_002', amount: 50, date: new Date().toISOString().split('T')[0], description: 'Vandalism report' }
-                    ]
-                }];
-                localStorage.setItem('civic_users', JSON.stringify(users));
-            }
             
             const user = users.find(u => u.email === email && u.password === password);
             
@@ -890,6 +807,27 @@
                 ];
                 localStorage.setItem('civic_complaints', JSON.stringify(initialComplaints));
             }
+            
+            // Create a default demo user for first-time users
+            if (!localStorage.getItem('civic_users') || JSON.parse(localStorage.getItem('civic_users')).length === 0) {
+                const defaultUser = {
+                    id: 'user_001',
+                    name: 'Alex Chen',
+                    email: 'alex@example.com',
+                    password: '123456',
+                    rewards: 175,
+                    joinDate: new Date().toISOString().split('T')[0],
+                    reportsCount: 5,
+                    resolvedCount: 3,
+                    avatar: '👤',
+                    transactions: [
+                        { id: 'tx_001', amount: 100, date: new Date().toISOString().split('T')[0], description: 'Illegal dumping report' },
+                        { id: 'tx_002', amount: 50, date: new Date().toISOString().split('T')[0], description: 'Vandalism report' },
+                        { id: 'tx_003', amount: 25, date: new Date().toISOString().split('T')[0], description: 'Littering report' }
+                    ]
+                };
+                localStorage.setItem('civic_users', JSON.stringify([defaultUser]));
+            }
         }
         
         // Initialize on load
@@ -908,4 +846,4 @@
         });
     </script>
 </body>
-</html>
+</html>g
